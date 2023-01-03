@@ -22,7 +22,12 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
-  Spinner
+  Spinner,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel
 } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
@@ -54,6 +59,7 @@ function App() {
   const [amount, setAmount] = useState('0.00000000')
   const [icon, setIcon] = useState('https://pioneers.dev/coins/ethereum.png')
   const [service, setService] = useState('')
+  const [tokenName, setTokenName] = useState('')
   const [blockchain, setBlockchain] = useState('')
   const [chainId, setChainId] = useState(1)
   const [web3, setWeb3] = useState('')
@@ -204,6 +210,11 @@ function App() {
     setToAddress(inputValue);
   };
 
+  const handleInputChangeToken = (e) => {
+    const inputValue = e.target.value;
+    setTokenName(inputValue);
+  };
+
   let handleSelect = async function(input){
     try{
       console.log("input: ",input.target.value)
@@ -257,27 +268,64 @@ try{
             <Spinner size='xl' color='green.500' />
           </div> : <div>
             <ModalBody>
-              <div>
-                amount: <input type="text"
-                               name="amount"
-                               value={amount}
-                               onChange={handleInputChangeAmount}/>
-              </div>
-              <br/>
-              <div>
-                address: <input type="text"
-                                name="address"
-                                value={toAddress}
-                                placeholder="0x651982e85D5E43db682cD6153488083e1b810798"
-                                onChange={handleInputChangeAddress}
-              />
-              </div>
-              <br/>
-              {error ? <div>error: {error}</div> : <div></div>}
-              {txid ? <div>txid: {txid}</div> : <div></div>}
-              {txid ? <div></div> : <div>
-                {signedTx ? <div>signedTx: {signedTx}</div> : <div></div>}
-              </div>}
+              <Tabs>
+                <TabList>
+                  <Tab>Native</Tab>
+                  <Tab>Token</Tab>
+                </TabList>
+                <TabPanels>
+                  <TabPanel>
+                    <div>
+                      amount: <input type="text"
+                                     name="amount"
+                                     value={amount}
+                                     onChange={handleInputChangeAmount}/>
+                    </div>
+                    <br/>
+                    <div>
+                      address: <input type="text"
+                                      name="address"
+                                      value={toAddress}
+                                      placeholder="0x651982e85D5E43db682cD6153488083e1b810798"
+                                      onChange={handleInputChangeAddress}
+                    />
+                    </div>
+                  </TabPanel>
+                  <TabPanel>
+                    <Text>ERC-20 spec token transfer</Text>
+                    <br/>
+                    <div>
+                      Search Token: <input type="text"
+                                           name="tokenName"
+                                           value={setTokenName}
+                                           placeholder="Tether (USDC)"
+                                           onChange={handleInputChangeToken}
+                    />
+                    </div>
+                    <div>
+                      amount: <input type="text"
+                                     name="amount"
+                                     value={amount}
+                                     onChange={handleInputChangeAmount}/>
+                    </div>
+                    <br/>
+                    <div>
+                      address: <input type="text"
+                                      name="address"
+                                      value={toAddress}
+                                      placeholder="0x651982e85D5E43db682cD6153488083e1b810798"
+                                      onChange={handleInputChangeAddress}
+                    />
+                    </div>
+                  </TabPanel>
+                </TabPanels>
+                <br/>
+                {error ? <div>error: {error}</div> : <div></div>}
+                {txid ? <div>txid: {txid}</div> : <div></div>}
+                {txid ? <div></div> : <div>
+                  {signedTx ? <div>signedTx: {signedTx}</div> : <div></div>}
+                </div>}
+              </Tabs>
 
             </ModalBody>
 
