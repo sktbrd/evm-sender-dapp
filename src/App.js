@@ -54,6 +54,7 @@ function App() {
   const [amount, setAmount] = useState('0.00000000')
   const [icon, setIcon] = useState('https://pioneers.dev/coins/ethereum.png')
   const [service, setService] = useState('')
+  const [blockchain, setBlockchain] = useState('')
   const [chainId, setChainId] = useState(1)
   const [web3, setWeb3] = useState('')
   const [toAddress, setToAddress] = useState('')
@@ -138,6 +139,8 @@ function App() {
 
   let onStart = async function(){
     try{
+      let pioneer = new pioneerApi(configPioneer.spec,configPioneer)
+      pioneer = await pioneer.init()
 
       let apiKey = localStorage.getItem("apiKey");
       configKeepKey.apiKey = apiKey
@@ -162,9 +165,17 @@ function App() {
       console.log("address: ",address)
       setAddress(address.address)
 
-      let web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/fb05c87983c4431baafd4600fd33de7e"))
+
+      let info = await pioneer.SearchByNetworkName('ethereum')
+      console.log("info: ",info.data)
+      setIcon(info.data[0].image)
+      setService(info.data[0].service)
+      setChainId(info.data[0].chainId)
+      setBlockchain(info.data[0].name)
+      let web3 = new Web3(new Web3.providers.HttpProvider(info.data[0].service))
       setWeb3(web3)
-      setChainId(1)
+
+
       web3.eth.getBalance(address.address, function(err, result) {
         if (err) {
           console.log(err)
@@ -206,6 +217,7 @@ function App() {
       setIcon(info.data[0].image)
       setService(info.data[0].service)
       setChainId(info.data[0].chainId)
+      setBlockchain(info.data[0].name)
       let web3 = new Web3(new Web3.providers.HttpProvider(info.data[0].service))
       setWeb3(web3)
 
@@ -223,12 +235,22 @@ function App() {
     }
   };
 
+  let handleClose = async function(input){
+try{
+      setTxid(null)
+      setSignedTx(null)
+      onClose()
+    }catch(e){
+      console.error(e)
+    }
+  };
+
   return (
     <ChakraProvider theme={theme}>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Sending Dash</ModalHeader>
+          <ModalHeader>Broadcasting to {blockchain}</ModalHeader>
           <ModalCloseButton />
           {loading ? <div>
             <div align='center'><h2>Broadcasted! waiting on confirmation!</h2></div>
@@ -246,7 +268,7 @@ function App() {
                 address: <input type="text"
                                 name="address"
                                 value={toAddress}
-                                placeholder="XwNbd46qdmbVWLdXievBhBMW7JYy8WiE7n"
+                                placeholder="0x651982e85D5E43db682cD6153488083e1b810798"
                                 onChange={handleInputChangeAddress}
               />
               </div>
@@ -272,7 +294,7 @@ function App() {
                   </Button>
                 </div> : <div></div>}
               </div> : <div></div>}
-              <Button colorScheme='blue' mr={3} onClick={onClose}>
+              <Button colorScheme='blue' mr={3} onClick={handleClose}>
                 exit
               </Button>
             </ModalFooter>
@@ -284,21 +306,35 @@ function App() {
           <ColorModeSwitcher justifySelf="flex-end" />
           <VStack spacing={8}>
             <Logo h="40vmin" pointerEvents="none" logo={icon} />
-            <Select placeholder='Select option' onChange={handleSelect}>
-              <option value='ethereum'>ETH</option>
-              <option value='bin'>BSC</option>
-              <option value='polygon'>MATIC</option>
-            </Select>
-            <Text>
-              address: {address}
-            </Text>
-            <Text>
-              balance: {balance}
-            </Text>
-            <Text>
-              chainId: {chainId}
-            </Text>
-            <Button onClick={onOpen}>Send</Button>
+            <Grid
+              templateRows="1fr 1fr 1fr"
+              gap="1rem"
+              alignItems="center"
+            >
+              <Box p="1rem" border="1px" borderColor="gray.300">
+                <Text fontSize="xl" fontWeight="bold">
+                  Selected: {blockchain} (chainId{chainId})
+                </Text>
+                <Select placeholder={'selected: '+blockchain} defaultValue='ethereum' onChange={handleSelect}>
+                  <option value='ethereum'>ETH</option>
+                  <option value='bin'>BSC</option>
+                  <option value='polygon'>MATIC</option>
+                </Select>
+              </Box>
+              <Box p="1rem" border="1px" borderColor="gray.300">
+                <Text>
+                  address: {address}
+                </Text>
+              </Box>
+              <Box p="1rem" border="1px" borderColor="gray.300">
+                <Text>
+                  balance: {balance}
+                </Text>
+              </Box>
+              <Box p="1rem" border="1px" borderColor="gray.300">
+                <Button colorScheme='green' onClick={onOpen}>Send</Button>
+              </Box>
+            </Grid>
           </VStack>
         </Grid>
       </Box>
