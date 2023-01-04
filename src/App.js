@@ -30,7 +30,8 @@ import {
   TabList,
   TabPanels,
   Tab,
-  TabPanel
+  TabPanel,
+  HStack
 } from '@chakra-ui/react';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
@@ -281,11 +282,13 @@ function App() {
     console.log("props: ",props)
     return(
     <Option {...props}>
-      <Image
-        boxSize={12}
-        src={props.data.image}
-      />
-      <div align='right'>{props.data.name}</div>
+      <HStack gap='14'>
+        <Image
+          boxSize={12}
+          src={props.data.image}
+        />
+        <div>{props.data.name}</div>
+      </HStack>
     </Option>
   )};
 
