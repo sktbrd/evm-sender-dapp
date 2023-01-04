@@ -22,6 +22,7 @@
     "coinselect": "^3.1.13",
     "framer-motion": "^6.2.9",
     "net": "^1.0.2",
+    "openapi-client-axios": "^6.0.0",
     "path": "^0.12.7",
     "react": "^18.2.0",
     "react-app-rewired": "^2.2.1",

@@ -24,7 +24,7 @@
     jsonpointer "^5.0.0"
     leven "^3.1.0"
 
-"@apidevtools/json-schema-ref-parser@^9.1.0":
+"@apidevtools/json-schema-ref-parser@^9.0.7", "@apidevtools/json-schema-ref-parser@^9.1.0":
   version "9.1.0"
   resolved "https://registry.yarnpkg.com/@apidevtools/json-schema-ref-parser/-/json-schema-ref-parser-9.1.0.tgz#a28015be4693af1b02bb955eb2dc2f27918f0090"
   integrity sha512-teB30tFooE3iQs2HQIKJ02D8UZA1Xy1zaczzhUjJs0CymYxeC0g+y5rCY2p8NHBM6DBUVoR8rSM4kHLj1WE9mQ==
@@ -9557,6 +9557,16 @@ open@^8.0.9, open@^8.4.0:
     define-lazy-prop "^2.0.0"
     is-docker "^2.1.1"
     is-wsl "^2.2.0"
+
+openapi-client-axios@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/openapi-client-axios/-/openapi-client-axios-6.0.0.tgz#3067ff0ebfb933a8b41d18cc9c246070c9addbd2"
+  integrity sha512-HY7uDiYa+XZ1jj3UkjNLfwlXDLhnQRJGEjL0o23EROK0e1LfwIV+VLhOsI4+VpgTOcbmgXdY5y8nyY5iUt2ASQ==
+  dependencies:
+    "@apidevtools/json-schema-ref-parser" "^9.0.7"
+    bath-es5 "^3.0.3"
+    copy-anything "^3.0.2"
+    openapi-types "^12.0.2"
 
 openapi-types@^12.0.2:
   version "12.1.0"
