@@ -4,7 +4,7 @@ import {
   useState,
 
 } from 'react';
-import { Select as SelectImported } from "chakra-react-select";
+import { Select as SelectImported, components } from "chakra-react-select";
 import {
   ChakraProvider,
   Select,
@@ -22,6 +22,7 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  Image,
   FormLabel,
   FormControl,
   Spinner,
@@ -191,7 +192,7 @@ function App() {
       })
 
       //get tokens for chain
-      let assets = await pioneer.SearchAssetsPageniateByChainId({chainId,limit:1000,skip:0})
+      let assets = await pioneer.SearchAssetsPageniateByChainId({chainId,limit:10,skip:0})
       assets = assets.data
       console.log("assets: ",assets)
       console.log("assets: ",assets)
@@ -199,7 +200,7 @@ function App() {
       for(let i = 0; i < assets.length; i++){
          let asset = assets[i]
         asset.value = asset.name
-        asset.label = asset.name
+        asset.label = asset.image
         assetsFormated.push(asset)
         // assetsFormated.push({
         //   value:asset.name,
@@ -207,23 +208,8 @@ function App() {
         // })
       }
 
-      //TODO placeholder
-      // export const colorOptions = [
-      //   { value: "blue", label: "Blue", color: "#0052CC" },
-      //   { value: "purple", label: "Purple", color: "#5243AA" },
-      //   { value: "red", label: "Red", color: "#FF5630" },
-      //   { value: "orange", label: "Orange", color: "#FF8B00" },
-      //   { value: "yellow", label: "Yellow", color: "#FFC400" },
-      //   { value: "green", label: "Green", color: "#36B37E" }
-      // ];
 
-      const groupedOptions = [
-        {
-          label: "Assets",
-          options: assetsFormated
-        }
-      ];
-      setAssets(groupedOptions)
+      setAssets(assetsFormated)
     }catch(e){
       console.error(e)
     }
@@ -290,6 +276,20 @@ function App() {
     }
   };
 
+  const { Option } = components;
+  const IconOption = props => {
+    console.log("props: ",props)
+    return(
+    <Option {...props}>
+      <Image
+        boxSize={12}
+        src={props.data.image}
+      />
+      <div align='right'>{props.data.name}</div>
+    </Option>
+  )};
+
+
   return (
     <ChakraProvider theme={theme}>
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -334,6 +334,7 @@ function App() {
                         options={assets}
                         placeholder="Select some colors..."
                         closeMenuOnSelect={true}
+                        components={{ Option: IconOption }}
                       ></SelectImported>
 
                     </FormControl>
