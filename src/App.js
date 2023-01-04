@@ -4,7 +4,7 @@ import {
   useState,
 
 } from 'react';
-import { ethers } from 'ethers'
+import { Select as SelectImported } from "chakra-react-select";
 import {
   ChakraProvider,
   Select,
@@ -22,6 +22,8 @@ import {
   ModalBody,
   ModalCloseButton,
   useDisclosure,
+  FormLabel,
+  FormControl,
   Spinner,
   Tabs,
   TabList,
@@ -32,9 +34,6 @@ import {
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 import { Logo } from './Logo';
 import { KeepKeySdk } from '@keepkey/keepkey-sdk'
-let {
-  bip32ToAddressNList
-} = require('@pioneer-platform/pioneer-coins')
 const Web3 = require("web3")
 const pioneerApi = require("@pioneer-platform/pioneer-client")
 let spec = 'http://localhost:1646/spec/swagger.json'
@@ -45,13 +44,13 @@ let configKeepKey = {
     basePath:spec
   }
 }
-let provider
 const configPioneer = {
   queryKey:'sdk:test-tutorial-medium',
   username:"dash-dapp",
-  spec:"https://pioneers.dev/spec/swagger.json"
-  // spec:"http://localhost:9001/spec/swagger.json"
+  // spec:"https://pioneers.dev/spec/swagger.json"
+  spec:"http://localhost:9001/spec/swagger.json"
 }
+
 
 function App() {
   const [address, setAddress] = useState('')
@@ -60,12 +59,12 @@ function App() {
   const [icon, setIcon] = useState('https://pioneers.dev/coins/ethereum.png')
   const [service, setService] = useState('')
   const [tokenName, setTokenName] = useState('')
+  const [assets, setAssets] = useState('')
   const [blockchain, setBlockchain] = useState('')
   const [chainId, setChainId] = useState(1)
   const [web3, setWeb3] = useState('')
   const [toAddress, setToAddress] = useState('')
   const [txid, setTxid] = useState(null)
-  const [inputs, setInputs] = useState([])
   const [signedTx, setSignedTx] = useState(null)
   const [loading, setLoading] = useState(null)
   const [error, setError] = useState(null)
@@ -190,6 +189,41 @@ function App() {
           setBalance(web3.utils.fromWei(result, "ether")+ " ETH")
         }
       })
+
+      //get tokens for chain
+      let assets = await pioneer.SearchAssetsPageniateByChainId({chainId,limit:1000,skip:0})
+      assets = assets.data
+      console.log("assets: ",assets)
+      console.log("assets: ",assets)
+      let assetsFormated = []
+      for(let i = 0; i < assets.length; i++){
+         let asset = assets[i]
+        asset.value = asset.name
+        asset.label = asset.name
+        assetsFormated.push(asset)
+        // assetsFormated.push({
+        //   value:asset.name,
+        //   label:asset.name
+        // })
+      }
+
+      //TODO placeholder
+      // export const colorOptions = [
+      //   { value: "blue", label: "Blue", color: "#0052CC" },
+      //   { value: "purple", label: "Purple", color: "#5243AA" },
+      //   { value: "red", label: "Red", color: "#FF5630" },
+      //   { value: "orange", label: "Orange", color: "#FF8B00" },
+      //   { value: "yellow", label: "Yellow", color: "#FFC400" },
+      //   { value: "green", label: "Green", color: "#36B37E" }
+      // ];
+
+      const groupedOptions = [
+        {
+          label: "Assets",
+          options: assetsFormated
+        }
+      ];
+      setAssets(groupedOptions)
     }catch(e){
       console.error(e)
     }
@@ -247,7 +281,7 @@ function App() {
   };
 
   let handleClose = async function(input){
-try{
+    try{
       setTxid(null)
       setSignedTx(null)
       onClose()
@@ -292,16 +326,19 @@ try{
                     </div>
                   </TabPanel>
                   <TabPanel>
-                    <Text>ERC-20 spec token transfer</Text>
+                    <FormControl p={4}>
+                      <FormLabel>Select Your Token</FormLabel>
+                      <SelectImported
+                        // isMulti
+                        name="assets"
+                        options={assets}
+                        placeholder="Select some colors..."
+                        closeMenuOnSelect={true}
+                      ></SelectImported>
+
+                    </FormControl>
+
                     <br/>
-                    <div>
-                      Search Token: <input type="text"
-                                           name="tokenName"
-                                           value={setTokenName}
-                                           placeholder="Tether (USDC)"
-                                           onChange={handleInputChangeToken}
-                    />
-                    </div>
                     <div>
                       amount: <input type="text"
                                      name="amount"

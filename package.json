@@ -18,6 +18,7 @@
     "@testing-library/user-event": "^14.1.0",
     "add": "^2.0.6",
     "browserify-zlib": "^0.2.0",
+    "chakra-react-select": "^4.4.3",
     "coinselect": "^3.1.13",
     "framer-motion": "^6.2.9",
     "net": "^1.0.2",
