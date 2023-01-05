@@ -7,7 +7,12 @@ import {
 import { Select as SelectImported, components } from "chakra-react-select";
 import {
   ChakraProvider,
+  Stack,
+  CardBody,
+  Card,
   Select,
+  CardFooter,
+  Heading,
   Box,
   Text,
   VStack,
@@ -56,10 +61,12 @@ const configPioneer = {
 function App() {
   const [address, setAddress] = useState('')
   const [balance, setBalance] = useState('0.000')
+  const [tokenBalance, setTokenBalance] = useState('0.000')
   const [amount, setAmount] = useState('0.00000000')
   const [icon, setIcon] = useState('https://pioneers.dev/coins/ethereum.png')
   const [service, setService] = useState('')
   const [tokenName, setTokenName] = useState('')
+  const [token, setToken] = useState('')
   const [assets, setAssets] = useState('')
   const [blockchain, setBlockchain] = useState('')
   const [chainId, setChainId] = useState(1)
@@ -68,8 +75,12 @@ function App() {
   const [txid, setTxid] = useState(null)
   const [signedTx, setSignedTx] = useState(null)
   const [loading, setLoading] = useState(null)
+  const [isTokenSelected, setIsTokenSelected] = useState(null)
   const [error, setError] = useState(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const [data, setData] = useState(() => [])
+  const [query, setQuery] = useState('bitcoin...');
+  const [timeOut, setTimeOut] = useState(null);
 
   let onSend = async function(){
     try{
@@ -97,29 +108,77 @@ function App() {
       gasPrice = web3.utils.toHex(gasPrice)
 
       //get gas limit
-      let gasLimit = await web3.eth.estimateGas({
-        to: address,
-        value: value,
-        data: "0x"
-      })
-      gasLimit = web3.utils.toHex(gasLimit)
+      let gasLimit
 
       //get balance
       let balance = await web3.eth.getBalance(address)
       console.log("balance: ",balance)
       console.log("chainId: ",chainId)
-      //sign
-      let input = {
-        nonce,
-        gasPrice,
-        gas:gasLimit,
-        value,
-        "from": address,
-        "to": toAddress,
-        "data": "0x",
-        chainId,
+      let input
+      if(token){
+        console.log("THIS IS A TOKEN SEND!")
+        if(!token.contract) throw Error("Invalid token contract address")
+
+        //get gas limit
+        gasLimit = await web3.eth.estimateGas({
+          to: address,
+          value: value,
+          data: "0x"
+        })
+        gasLimit = web3.utils.toHex(gasLimit + 21000) // Add 21000 gas to cover the size of the data payload
+
+        //get token data
+        let tokenData = await web3.eth.abi.encodeFunctionCall({
+          name: 'transfer',
+          type: 'function',
+          inputs: [
+            {
+              type: 'address',
+              name: '_to'
+            },
+            {
+              type: 'uint256',
+              name: '_value'
+            }
+          ]
+        }, [toAddress, value])
+
+        //sign
+        input = {
+          nonce,
+          gasPrice,
+          gas:gasLimit,
+          value: "0x0",
+          "from": address,
+          "to": token.contract,
+          "data": tokenData,
+          chainId,
+        }
+        console.log("input: ",input)
+
+      } else {
+        console.log("THIS IS A NATIVE SEND!")
+        //get gas limit
+        let gasLimit = await web3.eth.estimateGas({
+          to: address,
+          value: value,
+          data: "0x"
+        })
+        gasLimit = web3.utils.toHex(gasLimit)
+
+        //sign
+        input = {
+          nonce,
+          gasPrice,
+          gas:gasLimit,
+          value,
+          "from": address,
+          "to": toAddress,
+          "data": "0x",
+          chainId,
+        }
+        console.log("input: ",input)
       }
-      console.log("input: ",input)
 
       let responseSign = await sdk.eth.ethSignTransaction(input)
       console.log("responseSign: ", responseSign)
@@ -192,7 +251,7 @@ function App() {
       })
 
       //get tokens for chain
-      let assets = await pioneer.SearchAssetsPageniateByChainId({chainId,limit:10,skip:0})
+      let assets = await pioneer.SearchByNameAndChainId({chainId,name: 'fox'})
       assets = assets.data
       console.log("assets: ",assets)
       console.log("assets: ",assets)
@@ -200,14 +259,9 @@ function App() {
       for(let i = 0; i < assets.length; i++){
          let asset = assets[i]
         asset.value = asset.name
-        asset.label = asset.image
+        asset.label = asset.name
         assetsFormated.push(asset)
-        // assetsFormated.push({
-        //   value:asset.name,
-        //   label:asset.name
-        // })
       }
-
 
       setAssets(assetsFormated)
     }catch(e){
@@ -261,6 +315,7 @@ function App() {
           setBalance(web3.utils.fromWei(result, "ether")+ " ETH")
         }
       })
+
     }catch(e){
       console.error(e)
     }
@@ -276,23 +331,129 @@ function App() {
     }
   };
 
+  let closeToken = async function(){
+    try{
+      setToken(null)
+      setTokenName(null)
+
+    }catch(e){
+      console.error(e)
+    }
+  };
+
   const { Option } = components;
   const IconOption = props => {
-    console.log("props: ",props)
     return(
     <Option {...props}>
-      <Image
-        boxSize={12}
-        src={props.data.image}
-      />
-      <div align='right'>{props.data.name}</div>
+      <Card
+        direction={{ base: 'column', sm: 'row' }}
+        overflow='hidden'
+        variant='outline'
+      >
+        <Stack>
+          <Image
+            width={20}
+            height={20}
+            objectFit='cover'
+            src={props.data.image}
+          />
+        </Stack>
+        <Stack>
+          <CardBody>
+            <Grid >
+              <Heading size='md'>{props.data.name}</Heading>
+              <Text>symbol: {props.data.symbol}</Text>
+              <Text>link: <a href={props.data.explorer} target="_blank" ><Text color="blue">View Explorer</Text></a></Text>
+            </Grid>
+          </CardBody>
+        </Stack>
+      </Card>
     </Option>
   )};
 
+  let onSelectedToken = async function(input){
+    try{
+      console.log("input: onSelectedToken: ",input)
+      console.log("input: name: ",input.name)
+      console.log("input: contract: ",input.contract)
+      console.log("input: description: ",input.contract)
+      console.log("input: explorer: ",input.explorer)
+      console.log("input: decimals: ",input.decimals)
+
+      //set token
+      setToken(input)
+      //get balance
+
+      let minABI = [
+        // balanceOf
+        {
+          "constant":true,
+          "inputs":[{"name":"_owner","type":"address"}],
+          "name":"balanceOf",
+          "outputs":[{"name":"balance","type":"uint256"}],
+          "type":"function"
+        },
+        // decimals
+        {
+          "constant":true,
+          "inputs":[],
+          "name":"decimals",
+          "outputs":[{"name":"","type":"uint8"}],
+          "type":"function"
+        }
+      ];
+      const newContract = new web3.eth.Contract(minABI, input.contract);
+      const decimals = await newContract.methods.decimals().call();
+      const balanceBN = await newContract.methods.balanceOf(address).call()
+      console.log("input: balanceBN: ",balanceBN)
+      let tokenBalance = parseInt(balanceBN/Math.pow(10, decimals))
+      console.log("input: tokenBalance: ",tokenBalance)
+
+      setTokenBalance(tokenBalance)
+    }catch(e){
+      console.error(e)
+    }
+  };
+
+  const handleKeyPress = (event) => {
+    console.log("handleKeyPress")
+    if (timeOut) {
+      clearTimeout(timeOut);
+    }
+    setQuery(event.target.value);
+    setTimeOut(setTimeout(() => {
+      search(query);
+    }, 1000));
+  }
+
+  const search = async (query) => {
+    let pioneer = new pioneerApi(configPioneer.spec,configPioneer)
+    pioneer = await pioneer.init()
+
+    // console.log("event: ",event.target.value)
+    console.log("query: ",query)
+    // let searchNew = event.target.value
+    // setSearch(searchNew)
+
+    let assets = await pioneer.SearchByNameAndChainId({chainId,name:query})
+    assets = assets.data
+    console.log("KeepKeyPage1: ",assets.length)
+    console.log("assets: ",assets)
+    console.log("assets: ",assets)
+    let assetsFormated = []
+    for(let i = 0; i < assets.length; i++){
+      let asset = assets[i]
+      asset.value = asset.name
+      asset.label = asset.name
+      assetsFormated.push(asset)
+    }
+
+    setAssets(assetsFormated)
+  };
 
   return (
     <ChakraProvider theme={theme}>
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} size={'xxl'}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Broadcasting to {blockchain}</ModalHeader>
@@ -326,35 +487,92 @@ function App() {
                     </div>
                   </TabPanel>
                   <TabPanel>
-                    <FormControl p={4}>
-                      <FormLabel>Select Your Token</FormLabel>
-                      <SelectImported
-                        // isMulti
-                        name="assets"
-                        options={assets}
-                        placeholder="Select some colors..."
-                        closeMenuOnSelect={true}
-                        components={{ Option: IconOption }}
-                      ></SelectImported>
 
-                    </FormControl>
+                      {token ? <div>
+                        <Card
+                          direction={{ base: 'column', sm: 'row' }}
+                          overflow='hidden'
+                          variant='outline'
+                        >
+                          <Stack>
+                            <Button
+                              onClick={() => closeToken()}
+                              position="absolute"
+                              right="1rem"
+                              top="1rem"
+                              variant="ghost"
+                              variantColor="teal"
+                              size="sm"
+                            >
+                              X
+                            </Button>
+                            <Image
+                              width={130}
+                              height={130}
+                              objectFit='cover'
+                              src={token.image}
+                            />
+                          </Stack>
+                          <Stack>
+                            <CardBody>
+                              <Grid >
+                                <Heading size='md'>{token.name}</Heading>
+                                <Text py='2'>{token.description}</Text>
+                                <Text py='2'>contract:{token.contract}</Text>
+                                <Text py='2'>blockchain: {token.blockchain}</Text>
+                                <Text>link: <a href={token.explorer} target="_blank" ><Text color="blue">View Explorer</Text></a></Text>
+                              </Grid>
+                              <Card>
+                                <Text display="block" fontSize="2xl" textAlign="right">balance({token.symbol}): {tokenBalance}</Text>
+                              </Card>
+                            </CardBody>
+                          </Stack>
+                        </Card>
+                        <br/>
+                        <Card
+                          direction={{ base: 'column', sm: 'row' }}
+                          overflow='hidden'
+                          variant='outline'
+                        >
+                          <Stack>
+                        <div>
+                          amount: <input type="text"
+                                         name="amount"
+                                         value={amount}
+                                         onChange={handleInputChangeAmount}/>
+                        </div>
+                        <br/>
+                        <div>
+                          address: <input type="text"
+                                          name="address"
+                                          value={toAddress}
+                                          placeholder="0x651982e85D5E43db682cD6153488083e1b810798"
+                                          onChange={handleInputChangeAddress}
+                        />
+                        </div>
+                          </Stack>
+                        </Card>
+                      </div> : <div>
+                        <div>
+                          <Text> Search by Token name/symbol/contract... </Text>
+                        </div>
+                        <FormControl p={4}>
+                          <SelectImported
+                            defaultMenuIsOpen={true}
+                            // isMulti
+                            name="assets"
+                            options={assets}
+                            placeholder="usdc... dogelonmars... 0x2342...."
+                            closeMenuOnSelect={true}
+                            onKeyDown={handleKeyPress}
+                            components={{ Option: IconOption }}
+                            onChange={onSelectedToken}
+                          ></SelectImported>
 
-                    <br/>
-                    <div>
-                      amount: <input type="text"
-                                     name="amount"
-                                     value={amount}
-                                     onChange={handleInputChangeAmount}/>
-                    </div>
-                    <br/>
-                    <div>
-                      address: <input type="text"
-                                      name="address"
-                                      value={toAddress}
-                                      placeholder="0x651982e85D5E43db682cD6153488083e1b810798"
-                                      onChange={handleInputChangeAddress}
-                    />
-                    </div>
+                        </FormControl>
+                      </div>}
+
+
                   </TabPanel>
                 </TabPanels>
                 <br/>
