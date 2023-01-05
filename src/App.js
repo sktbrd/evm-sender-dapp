@@ -119,14 +119,6 @@ function App() {
         console.log("THIS IS A TOKEN SEND!")
         if(!token.contract) throw Error("Invalid token contract address")
 
-        //get gas limit
-        gasLimit = await web3.eth.estimateGas({
-          to: address,
-          value: value,
-          data: "0x"
-        })
-        gasLimit = web3.utils.toHex(gasLimit + 21000) // Add 21000 gas to cover the size of the data payload
-
         //get token data
         let tokenData = await web3.eth.abi.encodeFunctionCall({
           name: 'transfer',
@@ -142,6 +134,15 @@ function App() {
             }
           ]
         }, [toAddress, value])
+
+        //get gas limit
+        gasLimit = await web3.eth.estimateGas({
+          to: address,
+          value: value,
+          data: tokenData
+        })
+        gasLimit = web3.utils.toHex(gasLimit + 2000) // Add 21000 gas to cover the size of the data payload
+
 
         //sign
         input = {
@@ -325,6 +326,7 @@ function App() {
     try{
       setTxid(null)
       setSignedTx(null)
+      setToken(null)
       onClose()
     }catch(e){
       console.error(e)
@@ -453,7 +455,7 @@ function App() {
 
   return (
     <ChakraProvider theme={theme}>
-      <Modal isOpen={isOpen} onClose={onClose} size={'xxl'}>
+      <Modal isOpen={isOpen} onClose={handleClose} size={'xxl'}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Broadcasting to {blockchain}</ModalHeader>
