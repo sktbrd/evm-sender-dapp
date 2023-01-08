@@ -528,7 +528,7 @@ function App() {
 
   return (
     <ChakraProvider theme={theme}>
-      <Modal isOpen={isOpen} onClose={handleClose} size={'xxl'}>
+      <Modal isOpen={isOpen} onClose={handleClose} size={'xl'}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Broadcasting to {blockchain}</ModalHeader>

@@ -10,7 +10,7 @@
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
     "@keepkey/keepkey-sdk": "0.2.9",
-    "@pioneer-platform/pioneer-client": "^8.1.32",
+    "@pioneer-platform/pioneer-client": "8.1.30",
     "@pioneer-platform/pioneer-coins": "^8.1.53",
     "@shapeshiftoss/hdwallet-core": "^1.41.0",
     "@testing-library/jest-dom": "^5.16.4",
