@@ -7,6 +7,7 @@ import {
 import { Select as SelectImported, components } from "chakra-react-select";
 import {
   ChakraProvider,
+  extendTheme,
   Stack,
   CardBody,
   Card,
@@ -17,7 +18,6 @@ import {
   Text,
   VStack,
   Grid,
-  theme,
   Modal,
   Button,
   ModalOverlay,
@@ -47,7 +47,8 @@ let configKeepKey = {
   pairingInfo:{
     name: process.env['SERVICE_NAME'] || 'DASH',
     imageUrl: process.env['SERVICE_IMAGE_URL'] || 'https://assets.coincap.io/assets/icons/dash@2x.png',
-    basePath:spec
+    basePath:spec,
+    url:"https://evm-sender-dapp.vercel.app/"
   }
 }
 const configPioneer = {
@@ -57,6 +58,14 @@ const configPioneer = {
   // spec:"http://localhost:9001/spec/swagger.json"
 }
 
+// 2. Add your color mode config
+const config = {
+  initialColorMode: 'light',
+  useSystemColorMode: false,
+}
+
+// 3. extend the theme
+const theme = extendTheme({ config })
 
 function App() {
   const [address, setAddress] = useState('')
