@@ -60,7 +60,7 @@ const configPioneer = {
 
 // 2. Add your color mode config
 const config = {
-  initialColorMode: 'light',
+  initialColorMode: 'dark',
   useSystemColorMode: false,
 }
 
