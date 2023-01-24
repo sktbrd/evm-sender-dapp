@@ -353,7 +353,6 @@ function App() {
       let pioneer = new pioneerApi(configPioneer.spec,configPioneer)
       pioneer = await pioneer.init()
 
-
       //get provider info
       let info = await pioneer.SearchByNetworkName(input.target.value)
       console.log("handleSelect: ",info.data[0])
@@ -732,6 +731,7 @@ function App() {
                   <option value='ethereum'>ETH</option>
                   <option value='bin'>BSC</option>
                   <option value='polygon'>MATIC</option>
+                  <option value='gnosis'>GNOSIS</option>
                 </Select>
               </Box>
               <Box p="1rem" border="1px" borderColor="gray.300">
