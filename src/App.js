@@ -176,12 +176,18 @@ function App() {
       } else {
         //console.log("THIS IS A NATIVE SEND!")
         //get gas limit
-        let gasLimit = await web3.eth.estimateGas({
+        let gasLimitCall = {
           to: address,
           value: value,
           data: "0x"
-        })
-        gasLimit = web3.utils.toHex(gasLimit)
+        }
+        let gasLimit
+        try{
+          gasLimit = await web3.eth.estimateGas(gasLimitCall)
+          gasLimit = web3.utils.toHex(gasLimit)
+        }catch(e){
+          gasLimit = 30000
+        }
 
         //sign
         input = {
