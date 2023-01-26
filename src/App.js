@@ -118,6 +118,7 @@ function App() {
       //get gas price
       let gasPrice = await web3.eth.getGasPrice()
       gasPrice = web3.utils.toHex(gasPrice)
+      console.log("gasPrice: ",gasPrice)
 
       //get gas limit
       let gasLimit
@@ -156,7 +157,8 @@ function App() {
           })
           gasLimit = web3.utils.toHex(gasLimit + 41000) // Add 21000 gas to cover the size of the data payload
         }catch(e){
-
+          console.error("failed to get ESTIMATE GAS: ",e)
+          gasLimit = web3.utils.toHex(30000 + 41000)
         }
 
 
@@ -186,7 +188,7 @@ function App() {
           gasLimit = await web3.eth.estimateGas(gasLimitCall)
           gasLimit = web3.utils.toHex(gasLimit)
         }catch(e){
-          gasLimit = 30000
+          gasLimit = web3.utils.toHex(30000 )
         }
 
         //sign
@@ -367,7 +369,6 @@ function App() {
       let info = await pioneer.SearchByNetworkName(input.target.value)
       console.log("handleSelect: ",info.data[0])
       console.log("handleSelect: chainId: ",info.data[0].chainId)
-
       setIcon(info.data[0].image)
       setService(info.data[0].service)
       setChainId(info.data[0].chainId)
