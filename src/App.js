@@ -45,15 +45,15 @@ const pioneerApi = require("@pioneer-platform/pioneer-client")
 let spec = 'http://localhost:1646/spec/swagger.json'
 let configKeepKey = {
   pairingInfo:{
-    name: process.env['SERVICE_NAME'] || 'ETH and friends',
+    name: process.env['SERVICE_NAME'] || 'EVM Master',
     imageUrl: process.env['SERVICE_IMAGE_URL'] || 'https://assets.coincap.io/assets/icons/eth@2x.png',
     basePath:spec,
-    url:"https://evm-sender-dapp.vercel.app/"
+    url:"https://evm-sender-dapp-g3jtgasau-sktbrd.vercel.app/"
   }
 }
 const configPioneer = {
-  queryKey:'sdk:test-tutorial-medium',
-  username:"dash-dapp",
+  queryKey:'skateboard',
+  username:"sktbrd",
   spec:"https://pioneers.dev/spec/swagger.json"
   // spec:"http://localhost:9001/spec/swagger.json"
 }
