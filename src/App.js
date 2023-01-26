@@ -45,8 +45,8 @@ const pioneerApi = require("@pioneer-platform/pioneer-client")
 let spec = 'http://localhost:1646/spec/swagger.json'
 let configKeepKey = {
   pairingInfo:{
-    name: process.env['SERVICE_NAME'] || 'DASH',
-    imageUrl: process.env['SERVICE_IMAGE_URL'] || 'https://assets.coincap.io/assets/icons/dash@2x.png',
+    name: process.env['SERVICE_NAME'] || 'ETH and friends',
+    imageUrl: process.env['SERVICE_IMAGE_URL'] || 'https://assets.coincap.io/assets/icons/eth@2x.png',
     basePath:spec,
     url:"https://evm-sender-dapp.vercel.app/"
   }
@@ -124,7 +124,7 @@ function App() {
 
       //get balance
       let balance = await web3.eth.getBalance(address)
-      //console.log("balance: ",balance)
+      console.log("balance: ",balance)
       //console.log("chainId: ",chainId)
       let input
       if(contract){
@@ -148,12 +148,16 @@ function App() {
         }, [toAddress, value])
 
         //get gas limit
-        gasLimit = await web3.eth.estimateGas({
-          to: address,
-          value: value,
-          data: tokenData
-        })
-        gasLimit = web3.utils.toHex(gasLimit + 41000) // Add 21000 gas to cover the size of the data payload
+        try{
+          gasLimit = await web3.eth.estimateGas({
+            to: address,
+            value: value,
+            data: tokenData
+          })
+          gasLimit = web3.utils.toHex(gasLimit + 41000) // Add 21000 gas to cover the size of the data payload
+        }catch(e){
+
+        }
 
 
         //sign
@@ -192,7 +196,7 @@ function App() {
         }
         //console.log("input: ",input)
       }
-
+      console.log("input: ", input)
       let responseSign = await sdk.eth.ethSignTransaction(input)
       //console.log("responseSign: ", responseSign)
       setSignedTx(responseSign.serialized)
@@ -732,6 +736,7 @@ function App() {
                   <option value='bin'>BSC</option>
                   <option value='polygon'>MATIC</option>
                   <option value='gnosis'>GNOSIS</option>
+                  <option value='optimism'>OP</option>
                 </Select>
               </Box>
               <Box p="1rem" border="1px" borderColor="gray.300">
