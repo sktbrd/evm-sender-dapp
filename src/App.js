@@ -373,6 +373,7 @@ function App() {
       setService(info.data[0].service)
       setChainId(info.data[0].chainId)
       setBlockchain(info.data[0].name)
+
       let web3 = new Web3(new Web3.providers.HttpProvider(info.data[0].service))
       setWeb3(web3)
 
@@ -382,7 +383,7 @@ function App() {
           //console.log(err)
         } else {
           //console.log(web3.utils.fromWei(result, "ether") + " ETH")
-          setBalance(web3.utils.fromWei(result, "ether")+ " ETH")
+          setBalance(web3.utils.fromWei(result, "ether")+ " " + info.data[0].shortName)
         }
       })
     }catch(e){
