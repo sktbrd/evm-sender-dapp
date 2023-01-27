@@ -18,6 +18,7 @@ import {
   Text,
   VStack,
   Grid,
+  GridItem,
   Modal,
   Button,
   ModalOverlay,
@@ -369,6 +370,7 @@ function App() {
       let info = await pioneer.SearchByNetworkName(input.target.value)
       console.log("handleSelect: ",info.data[0])
       console.log("handleSelect: chainId: ",info.data[0].chainId)
+      console.log("handleSelect: shortName: ",info.data[0].shortName)
       setIcon(info.data[0].image)
       setService(info.data[0].service)
       setChainId(info.data[0].chainId)
@@ -716,6 +718,9 @@ function App() {
                   <Button colorScheme='green' mr={3} onClick={onBroadcast}>
                     broadcast
                   </Button>
+                  <Button colorScheme='green' mr={3} onClick={onBroadcast}>
+                    broadcast
+                  </Button>
                 </div> : <div></div>}
               </div> : <div></div>}
               <Button colorScheme='blue' mr={3} onClick={handleClose}>
@@ -730,14 +735,15 @@ function App() {
           <ColorModeSwitcher justifySelf="flex-end" />
           <VStack spacing={8}>
             <Logo h="40vmin" pointerEvents="none" logo={icon} />
-            <Grid
-              templateRows="1fr 1fr 1fr"
-              gap="1rem"
-              alignItems="center"
-            >
-              <Box p="1rem" border="1px" borderColor="gray.300">
+            <Grid templateColumns='repeat(4, 1fr)' gap={6}>
+              <GridItem w='100%' h='10' />
+              <GridItem w='100%' h='10' />
+              <GridItem w='100%' h='10' />
+              <GridItem w='100%' h='10' />
+
+              <Box p="1rem" border="1px" borderColor="green.300">
                 <Text fontSize="xl" fontWeight="bold">
-                  Selected: {blockchain} (chainId{chainId})
+                  Selected: {blockchain} [ {chainId} ]
                 </Text>
                 <Select placeholder={'selected: '+blockchain} defaultValue='ethereum' onChange={handleSelect}>
                   <option value='ethereum'>ETH</option>
@@ -747,18 +753,19 @@ function App() {
                   <option value='optimism'>OP</option>
                 </Select>
               </Box>
-              <Box p="1rem" border="1px" borderColor="gray.300">
+              <Box p="1rem" border="1px" borderColor="blue.300">
                 <Text>
-                  address: {address}
+                  Address: {address}
                 </Text>
               </Box>
-              <Box p="1rem" border="1px" borderColor="gray.300">
+              <Box p="1rem" border="1px" borderColor="red.300">
                 <Text>
-                  balance: {balance}
+                  Balance: {balance}
                 </Text>
               </Box>
-              <Box p="1rem" border="1px" borderColor="gray.300">
+              <Box p="1rem" border="1px" borderColor="pink.300">
                 <Button colorScheme='green' onClick={onOpen}>Send</Button>
+                
               </Box>
             </Grid>
           </VStack>
