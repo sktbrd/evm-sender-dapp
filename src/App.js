@@ -126,6 +126,7 @@ function App() {
 
       //get balance
       let balance = await web3.eth.getBalance(address)
+      
       console.log("balance: ",balance)
       //console.log("chainId: ",chainId)
       let input
@@ -547,7 +548,7 @@ function App() {
       console.error(e)
     }
   };
-
+  
   return (
     <ChakraProvider theme={theme}>
       <Modal isOpen={isOpen} onClose={handleClose} size={'xl'}>
@@ -610,7 +611,7 @@ function App() {
                                       onChange={handleInputChangeAddress}/>
                     </div>
 
-
+                    
                       {/*{token ? <div>*/}
                       {/*  <Card*/}
                       {/*    direction={{ base: 'column', sm: 'row' }}*/}
@@ -694,6 +695,7 @@ function App() {
 
                       {/*  </FormControl>*/}
                       {/*</div>}*/}
+              
                   </TabPanel>
                 </TabPanels>
                 <br/>
