@@ -51,8 +51,8 @@ let configKeepKey = {
 const configPioneer = {
   queryKey:'sdk:test-tutorial-medium',
   username:"dash-dapp",
-  // spec:"https://pioneers.dev/spec/swagger.json"
-  spec:"http://localhost:9001/spec/swagger.json"
+  spec:"https://pioneers.dev/spec/swagger.json"
+  // spec:"http://localhost:9001/spec/swagger.json"
 }
 
 // 2. Add your color mode config
