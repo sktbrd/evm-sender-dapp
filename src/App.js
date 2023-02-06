@@ -12,7 +12,6 @@ import {
   CardBody,
   Card,
   Select,
-  CardFooter,
   Heading,
   Box,
   Text,
@@ -28,8 +27,6 @@ import {
   ModalCloseButton,
   useDisclosure,
   Image,
-  FormLabel,
-  FormControl,
   Spinner,
   Tabs,
   TabList,
@@ -54,8 +51,8 @@ let configKeepKey = {
 const configPioneer = {
   queryKey:'sdk:test-tutorial-medium',
   username:"dash-dapp",
-  spec:"https://pioneers.dev/spec/swagger.json"
-  // spec:"http://localhost:9001/spec/swagger.json"
+  // spec:"https://pioneers.dev/spec/swagger.json"
+  spec:"http://localhost:9001/spec/swagger.json"
 }
 
 // 2. Add your color mode config
@@ -252,9 +249,11 @@ function App() {
       setAddress(address.address)
 
 
-      let info = await pioneer.SearchByNetworkName('ethereum')
+      let info = await pioneer.SearchByNetworkId(1)
       console.log("onStart: info: ",info.data[0])
-      
+      if(!info.data[0]) {
+        console.error("No network found!");
+      }
       setIcon(info.data[0].image)
       setService(info.data[0].service)
       setChainId(info.data[0].chainId)
