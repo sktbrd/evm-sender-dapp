@@ -267,7 +267,7 @@ function App() {
           console.error(err)
         } else {
           //console.log(web3.utils.fromWei(result, "ether") + " ETH")
-          setBalance(web3.utils.fromWei(result, "ether")+ result.symbol)
+          setBalance(web3.utils.fromWei(result, "ether")+ " " +info.data[0].symbol)
         }
       })
 
