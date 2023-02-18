@@ -102,11 +102,6 @@ function App() {
       localStorage.setItem("apiKey",configKeepKey.apiKey);
       //console.log("config: ",configKeepKey.apiKey)
 
-
-      //get value in hex
-      let value = web3.utils.toHex(web3.utils.toWei(amount, 'ether'))
-      //console.log("value: ",value)
-
       //web3 get nonce
       let nonce = await web3.eth.getTransactionCount(address)
       nonce = web3.utils.toHex(nonce)
@@ -126,8 +121,10 @@ function App() {
       //console.log("chainId: ",chainId)
       let input
       if(contract){
-        //console.log("THIS IS A TOKEN SEND!")
+        console.log("THIS IS A TOKEN SEND!")
         if(!contract) throw Error("Invalid token contract address")
+
+        let value = parseInt(amount/Math.pow(10, prescision))
 
         //get token data
         let tokenData = await web3.eth.abi.encodeFunctionCall({
@@ -152,7 +149,7 @@ function App() {
             value: value,
             data: tokenData
           })
-          gasLimit = web3.utils.toHex(gasLimit + 41000) // Add 21000 gas to cover the size of the data payload
+          gasLimit = web3.utils.toHex(gasLimit + 941000) // Add 21000 gas to cover the size of the data payload
         }catch(e){
           console.error("failed to get ESTIMATE GAS: ",e)
           gasLimit = web3.utils.toHex(30000 + 41000)
@@ -173,7 +170,11 @@ function App() {
         //console.log("input: ",input)
 
       } else {
-        //console.log("THIS IS A NATIVE SEND!")
+        console.log("THIS IS A NATIVE SEND!")
+        //get value in hex
+        let value = web3.utils.toHex(web3.utils.toWei(amount, 'ether'))
+        //console.log("value: ",value)
+
         //get gas limit
         let gasLimitCall = {
           to: address,
@@ -185,7 +186,7 @@ function App() {
           gasLimit = await web3.eth.estimateGas(gasLimitCall)
           gasLimit = web3.utils.toHex(gasLimit)
         }catch(e){
-          gasLimit = web3.utils.toHex(30000 )
+          gasLimit = web3.utils.toHex(300000 )
         }
 
         //sign
@@ -227,6 +228,7 @@ function App() {
 
   let onStart = async function(){
     try{
+      localStorage.setItem("chakra-ui-color-mode", "dark");
       let pioneer = new pioneerApi(configPioneer.spec,configPioneer)
       pioneer = await pioneer.init()
       let apiKey = localStorage.getItem("apiKey");
@@ -381,7 +383,7 @@ function App() {
           //console.log(err)
         } else {
           //console.log(web3.utils.fromWei(result, "ether") + " ETH")
-          setBalance(web3.utils.fromWei(result, "ether")+ " ETH")
+          setBalance(web3.utils.fromWei(result, "ether")+ " " +info.data[0].symbol)
         }
       })
     }catch(e){
@@ -391,6 +393,7 @@ function App() {
 
   let handleClose = async function(input){
     try{
+      setLoading(false)
       setTxid(null)
       setSignedTx(null)
       setToken(null)
