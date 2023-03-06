@@ -746,6 +746,7 @@ function App() {
                   <option value='polygon'>MATIC</option>
                   <option value='gnosis'>GNOSIS</option>
                   <option value='optimism'>OP</option>
+                  <option value='cronos'>CRO</option>
                 </Select>
               </Box>
               <Box p="1rem" border="1px" borderColor="gray.300">
