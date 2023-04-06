@@ -64,6 +64,59 @@ const config = {
 // 3. extend the theme
 const theme = extendTheme({ config })
 
+let ALL_CHAINS = [
+  { name: 'ethereum', chain_id: 1, symbol: 'ETH' },
+  { name: 'optimism', chain_id: 10, symbol: 'ETH' },
+  { name: 'gnosis', chain_id: 100, symbol: 'xDAI' },
+  { name: 'smart-bitcoin-cash', chain_id: 10000, symbol: 'BCH' },
+  { name: 'etherlite', chain_id: 111, symbol: 'ETL' },
+  { name: 'wagmi', chain_id: 11111, symbol: 'WGM' },
+  { name: 'fuse', chain_id: 122, symbol: 'FUSE' },
+  { name: 'polygon', chain_id: 137, symbol: 'MATIC' },
+  { name: 'flare', chain_id: 14, symbol: 'FLR' },
+  { name: 'bittorrent', chain_id: 199, symbol: 'BTT' },
+  { name: 'expanse', chain_id: 2, symbol: 'EXP' },
+  { name: 'arbitrum-on-xdai', chain_id: 200, symbol: 'xDAI' },
+  { name: 'cronos-beta', chain_id: 25, symbol: 'CRO' },
+  { name: 'shibachain', chain_id: 27, symbol: 'SHIB' },
+  { name: 'genesis-l1', chain_id: 29, symbol: 'L1' },
+  { name: 'ropsten', chain_id: 3, symbol: 'ROP' },
+  { name: 'rsk', chain_id: 30, symbol: 'RBTC' },
+  { name: 'pulsechain', chain_id: 369, symbol: 'PLS' },
+  { name: 'rinkeby', chain_id: 4, symbol: 'RIN' },
+  { name: 'telos-evm', chain_id: 40, symbol: 'TLOS' },
+  { name: 'kovan', chain_id: 42, symbol: 'KOV' },
+  { name: 'arbitrum', chain_id: 42161, symbol: 'ARB' },
+  { name: 'celo', chain_id: 42220, symbol: 'CELO' },
+  { name: 'athereum', chain_id: 43110, symbol: 'ATH' },
+  { name: 'avalanche-c-chain', chain_id: 43114, symbol: 'AVAX' },
+  { name: 'görli', chain_id: 5, symbol: 'GOR' },
+  { name: 'coinex-smart', chain_id: 52, symbol: 'cet' },
+  { name: 'uzmi', chain_id: 5315, symbol: 'UZMI' },
+  { name: 'zyx', chain_id: 55, symbol: 'ZYX' },
+  { name: 'binance-smart-chain', chain_id: 56, symbol: 'BNB' },
+  { name: 'syscoin', chain_id: 57, symbol: 'SYS' },
+  { name: 'ontology', chain_id: 58, symbol: 'ONG' },
+  { name: 'eos', chain_id: 59, symbol: 'EOS' },
+  { name: 'gochain', chain_id: 60, symbol: 'GO' },
+  { name: 'ethereum-classic', chain_id: 61, symbol: 'ETC' },
+  { name: 'ellaism', chain_id: 64, symbol: 'ELLA' },
+  { name: 'optimism-kovan', chain_id: 69, symbol: 'KOR' },
+  { name: 'thaichain', chain_id: 7, symbol: 'TCH' },
+  { name: 'idchain', chain_id: 74, symbol: 'EIDI' },
+  { name: 'mix', chain_id: 76, symbol: 'MIX' },
+  { name: 'poa-sokol', chain_id: 77, symbol: 'SPOA' },
+  { name: 'acala', chain_id: 787, symbol: 'ACA' },
+  { name: 'ubiq', chain_id: 8, symbol: 'UBQ' },
+  { name: 'nova', chain_id: 87, symbol: 'SNT' },
+  { name: 'tomochain', chain_id: 88, symbol: 'TOMO' },
+  { name: 'wanchain', chain_id: 888, symbol: 'WAN' },
+  { name: 'evmos', chain_id: 9001, symbol: 'EVMOS' },
+  { name: 'next-smart', chain_id: 96, symbol: 'NEXT' },
+  { name: 'poa-core', chain_id: 99, symbol: 'POA' },
+  { name: 'lucky', chain_id: 998, symbol: 'L99' }
+]
+
 function App() {
   const [address, setAddress] = useState('')
   const [balance, setBalance] = useState('0.000')
@@ -159,8 +212,11 @@ function App() {
         //sign
         input = {
           nonce,
-          gasPrice,
-          gas:gasLimit,
+          // gasPrice,
+          // gas:gasLimit,
+          gasLimit,
+          maxFeePerGas:gasPrice,
+          maxPriorityFeePerGas:gasPrice,
           value: "0x0",
           "from": address,
           "to": contract,
@@ -192,8 +248,11 @@ function App() {
         //sign
         input = {
           nonce,
-          gasPrice,
-          gas:gasLimit,
+          gasLimit,
+          maxFeePerGas:gasPrice,
+          maxPriorityFeePerGas:gasPrice,
+          // gasPrice,
+          // gas:gasLimit,
           value,
           "from": address,
           "to": toAddress,
@@ -741,13 +800,18 @@ function App() {
                   Selected: {blockchain} (chainId{chainId})
                 </Text>
                 <Select placeholder={'selected: '+blockchain} defaultValue='ethereum' onChange={handleSelect}>
-                  <option value='ethereum'>ETH</option>
-                  <option value='bin'>BSC</option>
-                  <option value='polygon'>MATIC</option>
-                  <option value='gnosis'>GNOSIS</option>
-                  <option value='optimism'>OP</option>
-                  <option value='cronos'>CRO</option>
+                  {ALL_CHAINS.map((blockchain) => (
+                    <option value={blockchain.name}>{blockchain.symbol}</option>
+                  ))}
                 </Select>
+                {/*<Select placeholder={'selected: '+blockchain} defaultValue='ethereum' onChange={handleSelect}>*/}
+                {/*  <option value='ethereum'>ETH</option>*/}
+                {/*  <option value='bin'>BSC</option>*/}
+                {/*  <option value='polygon'>MATIC</option>*/}
+                {/*  <option value='gnosis'>GNOSIS</option>*/}
+                {/*  <option value='optimism'>OP</option>*/}
+                {/*  <option value='cronos'>CRO</option>*/}
+                {/*</Select>*/}
               </Box>
               <Box p="1rem" border="1px" borderColor="gray.300">
                 <Text>
