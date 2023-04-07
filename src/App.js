@@ -12,6 +12,7 @@ import {
   CardBody,
   Card,
   Select,
+  CardFooter,
   Heading,
   Box,
   Text,
@@ -28,6 +29,8 @@ import {
   ModalCloseButton,
   useDisclosure,
   Image,
+  FormLabel,
+  FormControl,
   Spinner,
   Tabs,
   TabList,
@@ -64,26 +67,6 @@ const config = {
 
 // 3. extend the theme
 const theme = extendTheme({ config })
-
-let ALL_CHAINS = [
-  { name: 'ethereum', chain_id: 1, symbol: 'ETH' },
-  { name: 'polygon', chain_id: 137, symbol: 'MATIC' },
-  { name: 'optimism', chain_id: 10, symbol: 'ETH' },
-  { name: 'gnosis', chain_id: 100, symbol: 'xDAI' },
-  { name: 'binance-smart-chain', chain_id: 56, symbol: 'BNB' },
-  { name: 'smart-bitcoin-cash', chain_id: 10000, symbol: 'BCH' },
-  { name: 'arbitrum', chain_id: 42161, symbol: 'ARB' },
-  { name: 'fuse', chain_id: 122, symbol: 'FUSE' },
-  { name: 'bittorrent', chain_id: 199, symbol: 'BTT' },
-  { name: 'pulsechain', chain_id: 369, symbol: 'PLS' },
-  { name: 'celo', chain_id: 42220, symbol: 'CELO' },
-  { name: 'avalanche-c-chain', chain_id: 43114, symbol: 'AVAX' },
-  { name: 'görli', chain_id: 5, symbol: 'GOR' },
-  { name: 'eos', chain_id: 59, symbol: 'EOS' },
-  { name: 'ethereum-classic', chain_id: 61, symbol: 'ETC' },
-  { name: 'evmos', chain_id: 9001, symbol: 'EVMOS' },
-  { name: 'poa-core', chain_id: 99, symbol: 'POA' },
-]
 
 function App() {
   const [address, setAddress] = useState('')
@@ -123,6 +106,11 @@ function App() {
       localStorage.setItem("apiKey",configKeepKey.apiKey);
       //console.log("config: ",configKeepKey.apiKey)
 
+
+      //get value in hex
+      let value = web3.utils.toHex(web3.utils.toWei(amount, 'ether'))
+      //console.log("value: ",value)
+
       //web3 get nonce
       let nonce = await web3.eth.getTransactionCount(address)
       nonce = web3.utils.toHex(nonce)
@@ -143,10 +131,8 @@ function App() {
       //console.log("chainId: ",chainId)
       let input
       if(contract){
-        console.log("THIS IS A TOKEN SEND!")
+        //console.log("THIS IS A TOKEN SEND!")
         if(!contract) throw Error("Invalid token contract address")
-
-        let value = parseInt(amount/Math.pow(10, prescision))
 
         //get token data
         let tokenData = await web3.eth.abi.encodeFunctionCall({
@@ -171,7 +157,7 @@ function App() {
             value: value,
             data: tokenData
           })
-          gasLimit = web3.utils.toHex(gasLimit + 941000) // Add 21000 gas to cover the size of the data payload
+          gasLimit = web3.utils.toHex(gasLimit + 41000) // Add 21000 gas to cover the size of the data payload
         }catch(e){
           console.error("failed to get ESTIMATE GAS: ",e)
           gasLimit = web3.utils.toHex(30000 + 41000)
@@ -181,11 +167,8 @@ function App() {
         //sign
         input = {
           nonce,
-          // gasPrice,
-          // gas:gasLimit,
-          gasLimit,
-          maxFeePerGas:gasPrice,
-          maxPriorityFeePerGas:gasPrice,
+          gasPrice,
+          gas:gasLimit,
           value: "0x0",
           "from": address,
           "to": contract,
@@ -195,11 +178,7 @@ function App() {
         //console.log("input: ",input)
 
       } else {
-        console.log("THIS IS A NATIVE SEND!")
-        //get value in hex
-        let value = web3.utils.toHex(web3.utils.toWei(amount, 'ether'))
-        //console.log("value: ",value)
-
+        //console.log("THIS IS A NATIVE SEND!")
         //get gas limit
         let gasLimitCall = {
           to: address,
@@ -211,17 +190,14 @@ function App() {
           gasLimit = await web3.eth.estimateGas(gasLimitCall)
           gasLimit = web3.utils.toHex(gasLimit)
         }catch(e){
-          gasLimit = web3.utils.toHex(300000 )
+          gasLimit = web3.utils.toHex(30000 )
         }
 
         //sign
         input = {
           nonce,
-          gasLimit,
-          maxFeePerGas:gasPrice,
-          maxPriorityFeePerGas:gasPrice,
-          // gasPrice,
-          // gas:gasLimit,
+          gasPrice,
+          gas:gasLimit,
           value,
           "from": address,
           "to": toAddress,
@@ -256,7 +232,6 @@ function App() {
 
   let onStart = async function(){
     try{
-      localStorage.setItem("chakra-ui-color-mode", "dark");
       let pioneer = new pioneerApi(configPioneer.spec,configPioneer)
       pioneer = await pioneer.init()
       let apiKey = localStorage.getItem("apiKey");
@@ -279,11 +254,9 @@ function App() {
       setAddress(address.address)
 
 
-      let info = await pioneer.SearchByNetworkId(1)
+      let info = await pioneer.SearchByNetworkName('ethereum')
       console.log("onStart: info: ",info.data[0])
-      if(!info.data[0]) {
-        console.error("No network found!");
-      }
+      
       setIcon(info.data[0].image)
       setService(info.data[0].service)
       setChainId(info.data[0].chainId)
@@ -297,7 +270,7 @@ function App() {
           console.error(err)
         } else {
           //console.log(web3.utils.fromWei(result, "ether") + " ETH")
-          setBalance(web3.utils.fromWei(result, "ether")+ " " +info.data[0].symbol)
+          setBalance(web3.utils.fromWei(result, "ether")+ " ETH")
         }
       })
 
@@ -414,11 +387,7 @@ function App() {
           //console.log(err)
         } else {
           //console.log(web3.utils.fromWei(result, "ether") + " ETH")
-<<<<<<< HEAD
           setBalance(web3.utils.fromWei(result, "ether")+ " " + info.data[0].nativeCurrency.name)
-=======
-          setBalance(web3.utils.fromWei(result, "ether")+ " " +info.data[0].symbol)
->>>>>>> 44c9818dacedb5c34a49b15ba0d4560037655887
         }
       })
     }catch(e){
@@ -428,7 +397,6 @@ function App() {
 
   let handleClose = async function(input){
     try{
-      setLoading(false)
       setTxid(null)
       setSignedTx(null)
       setToken(null)
@@ -779,28 +747,13 @@ function App() {
                 <Text fontSize="xl" fontWeight="bold">
                   {blockchain} [ {chainId} ]
                 </Text>
-<<<<<<< HEAD
                 <Select placeholder={'selected: '+ blockchain} defaultValue='ethereum' onChange={handleSelect}>
                   <option value='ethereum'>ETH</option>
                   <option value='bin'>BSC</option>
                   <option value='polygon'>MATIC</option>
                   <option value='gnosis'>GNOSIS</option>
                   <option value='optimism'>OP</option>
-=======
-                <Select placeholder={'selected: '+blockchain} defaultValue='ethereum' onChange={handleSelect}>
-                  {ALL_CHAINS.map((blockchain) => (
-                    <option value={blockchain.name}>{blockchain.symbol}</option>
-                  ))}
->>>>>>> 44c9818dacedb5c34a49b15ba0d4560037655887
                 </Select>
-                {/*<Select placeholder={'selected: '+blockchain} defaultValue='ethereum' onChange={handleSelect}>*/}
-                {/*  <option value='ethereum'>ETH</option>*/}
-                {/*  <option value='bin'>BSC</option>*/}
-                {/*  <option value='polygon'>MATIC</option>*/}
-                {/*  <option value='gnosis'>GNOSIS</option>*/}
-                {/*  <option value='optimism'>OP</option>*/}
-                {/*  <option value='cronos'>CRO</option>*/}
-                {/*</Select>*/}
               </Box>
               <Box p="1rem" border="2px" borderColor="blue.300">
                 <Text>
