@@ -72,10 +72,10 @@ function App() {
   const [address, setAddress] = useState('')
   const [balance, setBalance] = useState('0.000')
   const [tokenBalance, setTokenBalance] = useState('0.000')
-  const [amount, setAmount] = useState('0.00000000')
+  const [amount, setAmount] = useState('0.0000')
   const [contract, setContract] = useState('')
   const [block, setBlock] = useState('')
-  const [icon, setIcon] = useState('https://pioneers.dev/coins/ethereum.png')
+  const [icon, setIcon] = useState('https://i.ibb.co/cc4hTsW/image.png')
   const [service, setService] = useState('')
   const [tokenName, setTokenName] = useState('')
   const [prescision, setPrescision] = useState('')
@@ -719,15 +719,15 @@ function App() {
               {!txid ? <div>
                 {signedTx ? <div>
                   <Button colorScheme='green' mr={3} onClick={onBroadcast}>
-                    broadcast
+                    Broadcast
                   </Button>
                   <Button colorScheme='green' mr={3} onClick={onBroadcast}>
-                    broadcast
+                    Broadcast
                   </Button>
                 </div> : <div></div>}
               </div> : <div></div>}
               <Button colorScheme='blue' mr={3} onClick={handleClose}>
-                exit
+                Exit
               </Button>
             </ModalFooter>
           </div>}
@@ -743,11 +743,11 @@ function App() {
               <GridItem w='100%' h='10' />
               <GridItem w='100%' h='10' />
 
-              <Box p="1rem" border="1px" borderColor="green.300">
+              <Box p="1rem" border="2px" borderColor="green.300">
                 <Text fontSize="xl" fontWeight="bold">
                   {blockchain} [ {chainId} ]
                 </Text>
-                <Select placeholder={'selected: '+blockchain} defaultValue='ethereum' onChange={handleSelect}>
+                <Select placeholder={'selected: '+ blockchain} defaultValue='ethereum' onChange={handleSelect}>
                   <option value='ethereum'>ETH</option>
                   <option value='bin'>BSC</option>
                   <option value='polygon'>MATIC</option>
@@ -755,12 +755,12 @@ function App() {
                   <option value='optimism'>OP</option>
                 </Select>
               </Box>
-              <Box p="1rem" border="1px" borderColor="blue.300">
+              <Box p="1rem" border="2px" borderColor="blue.300">
                 <Text>
                   Address: {address}
                 </Text>
               </Box>
-              <Box p="1rem" border="1px" borderColor="red.300">
+              <Box p="1rem" border="2px" borderColor="red.300">
                 <Text>
                   Balance: {balance}
                 </Text>
